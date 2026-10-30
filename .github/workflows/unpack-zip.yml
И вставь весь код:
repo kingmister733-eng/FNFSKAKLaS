@@ -1,0 +1,106 @@
+name: Download and Unpack ZIP
+
+on:
+  workflow_dispatch:
+    inputs:
+      zip_url:
+        description: "Google Drive ZIP link or file ID"
+        required: true
+        type: string
+      target_dir:
+        description: "Destination folder"
+        required: true
+        default: "imported-sources"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Python environment
+        run: |
+          python3 -m venv /tmp/gdown-env
+          /tmp/gdown-env/bin/pip install --upgrade pip
+          /tmp/gdown-env/bin/pip install gdown
+
+      - name: Download ZIP from Google Drive
+        env:
+          ZIP_URL: ${{ inputs.zip_url }}
+        run: |
+          FILE_ID="$(python3 -c 'import re,sys; s=sys.argv[1].strip(); m=re.search(r"/file/d/([A-Za-z0-9_-]+)",s) or re.search(r"[?&]id=([A-Za-z0-9_-]+)",s); print(m.group(1) if m else s)' "$ZIP_URL")"
+          if [[ ! "$FILE_ID" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            echo "Could not identify a valid Google Drive file ID."
+            exit 1
+          fi
+          echo "Downloading Google Drive file ID: $FILE_ID"
+          /tmp/gdown-env/bin/gdown "$FILE_ID" -O /tmp/source.zip
+          test -s /tmp/source.zip
+          echo "Archive downloaded:"
+          du -h /tmp/source.zip
+          unzip -t /tmp/source.zip
+
+      - name: Validate destination
+        env:
+          TARGET_DIR: ${{ inputs.target_dir }}
+        run: |
+          case "$TARGET_DIR" in
+            imported-sources) ;;
+            *) echo "Invalid destination folder"; exit 1 ;;
+          esac
+          mkdir -p "$TARGET_DIR"
+
+      - name: Extract ZIP safely
+        env:
+          TARGET_DIR: ${{ inputs.target_dir }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import zipfile
+
+          archive = "/tmp/source.zip"
+          target = os.environ["TARGET_DIR"]
+          total = 0
+
+          with zipfile.ZipFile(archive) as z:
+              for item in z.infolist():
+                  name = item.filename
+                  if name.startswith("/") or ".." in name.split("/"):
+                      raise SystemExit(f"Unsafe path: {name}")
+                  if item.file_size > 100 * 1024 * 1024:
+                      raise SystemExit(
+                          f"File exceeds GitHub Git limit (100 MiB): {name}"
+                      )
+                  total += item.file_size
+
+              print(f"Files: {len(z.infolist())}")
+              print(f"Uncompressed size: {total / 1024**3:.2f} GiB")
+
+              z.extractall(target)
+
+          print("Extraction completed.")
+          PY
+
+      - name: Check repository size
+        run: |
+          du -sh imported-sources
+          find imported-sources -type f | wc -l
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add imported-sources
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Import extracted source files"
+            git push
+          fi
