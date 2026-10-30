@@ -71,6 +71,7 @@
 
 	<!-- Assets -->
 	<assets path="assets/fonts" />
+	<assets path="assets/dustin" />
 	<!-- Additional built-in FNF mod menu assets. -->
 	<assets path="assets/dustin" exclude="*.ogg" if="web" />
 	<assets path="assets/dustin" exclude="*.mp3" unless="web" />
