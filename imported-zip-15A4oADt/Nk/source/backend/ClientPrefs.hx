@@ -23,12 +23,12 @@ import states.TitleState;
 	public var hitboxRGB:Array<FlxColor> = [0xFFC24B99, 0xFF00FFFF, 0xFF12FA05, 0xFFF9393F];
 	public var flashing:Bool = true;
 	public var autoPause:Bool = true;
-	public var antialiasing:Bool = true;
+	public var antialiasing:Bool = #if mobile false #else true #end;
 	public var noteSkin:String = 'Default';
 	public var splashSkin:String = 'Psych';
 	public var splashAlpha:Float = 0.6;
-	public var lowQuality:Bool = false;
-	public var shaders:Bool = true;
+	public var lowQuality:Bool = #if mobile true #else false #end;
+	public var shaders:Bool = #if mobile false #else true #end;
 	public var cacheOnGPU:Bool = #if !switch false #else true #end; // GPU Caching made by Raltyro
 	public var framerate:Int = 60;
 	public var camZooms:Bool = true;
