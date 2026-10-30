@@ -78,7 +78,9 @@ jobs:
           # storage directory on Android, as used by the iOS branch below.
           main = Path(os.environ["BUILD_DIR"]) / "source" / "Main.hx"
           m = main.read_text()
-          old_import = "#if android\\nimport android.content.Context;\\n#end"
+          old_import = """#if android
+import android.content.Context;
+#end"""
           if old_import not in m:
               raise SystemExit("Expected Android Context import block was not found in source/Main.hx")
           m = m.replace(old_import, "", 1)
