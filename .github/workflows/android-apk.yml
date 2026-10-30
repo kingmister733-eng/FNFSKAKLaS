@@ -78,7 +78,7 @@ jobs:
           main = Path(os.environ["BUILD_DIR"]) / "source" / "Main.hx"
           m = main.read_text()
           m, import_count = re.subn(
-              r"(?m)^#if android\\r?\\nimport android\\.content\\.Context;\\r?\\n#end\\r?\\n?",
+              r"(?m)^#if android\r?\nimport android\.content\.Context;\r?\n#end\r?\n?",
               "",
               m,
               count=1
