@@ -112,8 +112,8 @@ jobs:
           copy_mod_assets stages shared/stages
           copy_mod_assets weeks shared/weeks
           copy_mod_assets images shared/images
-          copy_mod_assets music shared/music
-          copy_mod_assets sounds shared/sounds
+          copy_mod_assets music music
+          copy_mod_assets sounds sounds
           copy_mod_assets fonts fonts
           copy_mod_assets dustin dustin
 
