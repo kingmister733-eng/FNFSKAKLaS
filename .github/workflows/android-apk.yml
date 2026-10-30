@@ -109,7 +109,9 @@ jobs:
           mkdir -p "$HOME/haxelib"
           haxelib setup "$HOME/haxelib"
           haxelib git hxcpp https://github.com/HaxeFoundation/hxcpp.git d3d6deafcabe60fbfde5d7efc54c11731f2737d6
-          haxelib run hxcpp
+          cd "$(haxelib libpath hxcpp)/tools/hxcpp"
+          haxe compile.hxml
+          cd "$BUILD_DIR"
           haxelib install lime 8.1.2
           haxelib install openfl 9.3.3
           haxelib install flixel 5.6.1
