@@ -38,6 +38,24 @@ jobs:
             imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/sounds
             imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/fonts
             imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/dustin
+      - name: Checkout FNF mod assets
+        uses: actions/checkout@v4
+        with:
+          repository: kingmister733-eng/FNF
+          ref: 1be5ef46fd816adc05b0e1276b7d83ad23255d11
+          path: .mod-source
+          sparse-checkout: |
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/shared
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/songs
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/data
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/characters
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/stages
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/weeks
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/images
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/music
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/sounds
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/fonts
+            imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets/dustin
       - name: Set up Haxe
         uses: krdlab/setup-haxe@master
         with:
@@ -75,6 +93,33 @@ jobs:
           rm -rf "$BUILD_DIR/assets"
           mkdir -p "$BUILD_DIR/assets"
           cp -a "imported-zip-15A4oADt/Nkk/assets/." "$BUILD_DIR/assets/"
+
+          # Stage the FNF mod as built-in Psych Engine assets.
+          MOD_ASSETS="$GITHUB_WORKSPACE/.mod-source/imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets"
+          test -d "$MOD_ASSETS/shared"
+          copy_mod_assets() {
+            local source_dir="$MOD_ASSETS/$1"
+            local target_dir="$BUILD_DIR/assets/$2"
+            if [[ -d "$source_dir" ]]; then
+              mkdir -p "$target_dir"
+              cp -a "$source_dir/." "$target_dir/"
+            fi
+          }
+          copy_mod_assets shared shared
+          copy_mod_assets songs songs
+          copy_mod_assets data shared/data
+          copy_mod_assets characters shared/characters
+          copy_mod_assets stages shared/stages
+          copy_mod_assets weeks shared/weeks
+          copy_mod_assets images shared/images
+          copy_mod_assets music shared/music
+          copy_mod_assets sounds shared/sounds
+          copy_mod_assets fonts fonts
+          copy_mod_assets dustin dustin
+
+          echo "Staged FNF mod charts and audio:"
+          find "$BUILD_DIR/assets/shared/data" -maxdepth 2 -type f -name '*.json' | sort
+          find "$BUILD_DIR/assets/songs" -mindepth 2 -maxdepth 2 -type f -name 'Inst.ogg' | sort
 
           # Bring in the actual FNF mod as built-in Psych Engine assets.
           MOD_ASSETS="$GITHUB_WORKSPACE/.mod-source/imported-zip-15A4oADt/fnd_demo_bug_patch_v1point5/assets"
