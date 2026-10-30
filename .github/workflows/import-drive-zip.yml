@@ -1,0 +1,103 @@
+name: Import Google Drive ZIP
+
+on:
+  workflow_dispatch:
+    inputs:
+      zip_url:
+        description: "Google Drive link or file ID"
+        required: true
+        default: "https://drive.google.com/file/d/15A4oADt_sSuWO5wmAPBVvKJPSk_smfcd/view?usp=drivesdk"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  import-zip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install downloader
+        run: |
+          python3 -m venv /tmp/gdown-env
+          /tmp/gdown-env/bin/pip install --disable-pip-version-check gdown
+
+      - name: Download ZIP from Google Drive
+        env:
+          ZIP_URL: ${{ inputs.zip_url }}
+        run: |
+          FILE_ID="$(python3 -c 'import re,sys; s=sys.argv[1].strip(); m=re.search(r"/file/d/([A-Za-z0-9_-]+)",s) or re.search(r"[?&]id=([A-Za-z0-9_-]+)",s); print(m.group(1) if m else s)' "$ZIP_URL")"
+          if [[ ! "$FILE_ID" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            echo "::error::Could not extract a valid Google Drive file ID."
+            exit 1
+          fi
+
+          echo "Downloading Drive file: $FILE_ID"
+          /tmp/gdown-env/bin/gdown "$FILE_ID" --output /tmp/source.zip --retries 5 --timeout 60
+          test -s /tmp/source.zip
+          echo "Downloaded archive:"
+          du -h /tmp/source.zip
+          unzip -tq /tmp/source.zip
+
+      - name: Validate and extract archive
+        run: |
+          python3 - <<'PY'
+          import os
+          import zipfile
+
+          archive = "/tmp/source.zip"
+          destination = "imported-zip-15A4oADt"
+          os.makedirs(destination, exist_ok=True)
+
+          total_size = 0
+          with zipfile.ZipFile(archive) as z:
+              entries = z.infolist()
+              for item in entries:
+                  name = item.filename
+                  parts = name.replace("\\\\", "/").split("/")
+                  if name.startswith(("/", "\\\\")) or ".." in parts:
+                      raise SystemExit(f"Unsafe archive path: {name}")
+                  if item.file_size > 100 * 1024 * 1024:
+                      raise SystemExit(
+                          f"File exceeds GitHub's 100 MiB file limit: {name} "
+                          f"({item.file_size / 1024**2:.1f} MiB)"
+                      )
+                  total_size += item.file_size
+
+              print(f"Archive entries: {len(entries)}")
+              print(f"Uncompressed size: {total_size / 1024**3:.2f} GiB")
+              if total_size > 10 * 1024**3:
+                  raise SystemExit("Uncompressed archive exceeds the 10 GiB safety limit.")
+              z.extractall(destination)
+
+          print(f"Extraction complete: {destination}")
+          PY
+
+      - name: Check imported files
+        run: |
+          echo "Extracted folder size:"
+          du -sh imported-zip-15A4oADt
+          echo "Number of files:"
+          find imported-zip-15A4oADt -type f | wc -l
+          if [ -z "$(find imported-zip-15A4oADt -type f -print -quit)" ]; then
+            echo "::error::The ZIP contains no files."
+            exit 1
+          fi
+
+      - name: Commit and push imported files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add imported-zip-15A4oADt
+          if git diff --cached --quiet; then
+            echo "No new files to commit."
+          else
+            git commit -m "Import files from Google Drive ZIP"
+            git push origin HEAD
+          fi
