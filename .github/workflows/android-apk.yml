@@ -72,6 +72,21 @@ jobs:
               raise SystemExit("Expected VIDEOS_ALLOWED target condition was not found")
           s = s.replace(old_video, 'if="windows || linux || mac"', 1)
           p.write_text(s)
+
+          # The uploaded Main.hx imports android.content.Context, but no Haxe
+          # Android extern/library is included. Lime already exposes the app
+          # storage directory on Android, as used by the iOS branch below.
+          main = Path(os.environ["BUILD_DIR"]) / "source" / "Main.hx"
+          m = main.read_text()
+          old_import = "#if android\\nimport android.content.Context;\\n#end"
+          if old_import not in m:
+              raise SystemExit("Expected Android Context import block was not found in source/Main.hx")
+          m = m.replace(old_import, "", 1)
+          old_path = "Sys.setCwd(Path.addTrailingSlash(Context.getExternalFilesDir()));"
+          if old_path not in m:
+              raise SystemExit("Expected Context.getExternalFilesDir() call was not found in source/Main.hx")
+          m = m.replace(old_path, "Sys.setCwd(lime.system.System.applicationStorageDirectory);", 1)
+          main.write_text(m)
           PY
 
           test -f "$BUILD_DIR/Project.xml"
