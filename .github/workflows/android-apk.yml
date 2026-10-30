@@ -139,7 +139,7 @@ jobs:
         working-directory: ${{ env.BUILD_DIR }}
         run: |
           set -o pipefail
-          haxelib run lime build android -D officialBuild 2>&1 | tee android-build.log
+          haxelib run lime build android -D officialBuild -D mobile 2>&1 | tee android-build.log
 
       - name: Upload APK and build log
         if: always()
