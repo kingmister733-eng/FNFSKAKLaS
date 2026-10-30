@@ -1,0 +1,122 @@
+name: Android APK (Psych Engine + uploaded assets)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - android/mobile-port-assets-audit
+    paths:
+      - "android-port/**"
+      - "imported-zip-15A4oADt/Nk/**"
+      - "imported-zip-15A4oADt/Nkk/assets/**"
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    env:
+      PSYCH_UPSTREAM_COMMIT: 5c67ced49e5a98535298a6daa3f8f4ec79ac8399
+      BUILD_DIR: ${{ runner.temp }}/PsychEngine
+    steps:
+      - name: Checkout uploaded project files
+        uses: actions/checkout@v4
+
+      - name: Set up Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        run: |
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653" "cmake;3.22.1"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/25.2.9519653" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> "$GITHUB_ENV"
+
+      - name: Assemble the exact uploaded source and assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/ShadowMario/FNF-PsychEngine.git "$BUILD_DIR"
+          git -C "$BUILD_DIR" fetch --depth 1 origin "$PSYCH_UPSTREAM_COMMIT"
+          git -C "$BUILD_DIR" checkout --detach "$PSYCH_UPSTREAM_COMMIT"
+
+          cp -a "imported-zip-15A4oADt/Nk/source/." "$BUILD_DIR/source/"
+          cp "imported-zip-15A4oADt/Nk/Project.xml" "$BUILD_DIR/Project.xml"
+
+          rm -rf "$BUILD_DIR/assets"
+          mkdir -p "$BUILD_DIR/assets"
+          cp -a "imported-zip-15A4oADt/Nkk/assets/." "$BUILD_DIR/assets/"
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          p = Path(os.environ["BUILD_DIR"]) / "Project.xml"
+          s = p.read_text()
+          old_discord = '<define name="DISCORD_ALLOWED" />'
+          if old_discord not in s:
+              raise SystemExit("Expected DISCORD_ALLOWED definition was not found")
+          s = s.replace(old_discord, '<define name="DISCORD_ALLOWED" if="desktop" />', 1)
+          old_video = 'if="windows || linux || android || mac"'
+          if old_video not in s:
+              raise SystemExit("Expected VIDEOS_ALLOWED target condition was not found")
+          s = s.replace(old_video, 'if="windows || linux || mac"', 1)
+          p.write_text(s)
+          PY
+
+          test -f "$BUILD_DIR/Project.xml"
+          test -f "$BUILD_DIR/source/Main.hx"
+          test -f "$BUILD_DIR/source/backend/Controls.hx"
+          for dir in fonts shared embed songs week_assets translations base_game secrets; do
+            test -d "$BUILD_DIR/assets/$dir" || { echo "Missing required asset directory: $dir"; exit 1; }
+          done
+          test -f "$BUILD_DIR/art/icons/iconOG.png"
+          echo "Staged Psych Engine source and uploaded assets successfully."
+          du -sh "$BUILD_DIR/source" "$BUILD_DIR/assets"
+
+      - name: Install Haxe dependencies
+        working-directory: ${{ env.BUILD_DIR }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/haxelib"
+          haxelib setup "$HOME/haxelib"
+          haxelib install hxcpp
+          haxelib install lime 8.1.2
+          haxelib install openfl 9.3.3
+          haxelib install flixel 5.6.1
+          haxelib install flixel-addons 3.2.2
+          haxelib install flixel-tools 1.5.1
+          haxelib install tjson 1.4.0
+          haxelib git flxanimate https://github.com/Dot-Stuff/flxanimate 768740a56b26aa0c072720e0d1236b94afe68e3e
+          haxelib git funkin.vis https://github.com/FunkinCrew/funkVis 22b1ce089dd924f15cdc4632397ef3504d464e90
+          haxelib git grig.audio https://gitlab.com/haxe-grig/grig.audio.git cbf91e2180fd2e374924fe74844086aab7891666
+          haxelib set lime 8.1.2
+          haxelib set openfl 9.3.3
+
+      - name: Build Android APK
+        working-directory: ${{ env.BUILD_DIR }}
+        run: |
+          set -o pipefail
+          haxelib run lime build android -D officialBuild 2>&1 | tee android-build.log
+
+      - name: Upload APK and build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: psych-engine-android-build
+          path: |
+            ${{ env.BUILD_DIR }}/export/**/*.apk
+            ${{ env.BUILD_DIR }}/android-build.log
+          if-no-files-found: warn
+          retention-days: 14
