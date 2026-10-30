@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 90
     env:
       PSYCH_UPSTREAM_COMMIT: 5c67ced49e5a98535298a6daa3f8f4ec79ac8399
-      BUILD_DIR: ${{ runner.temp }}/PsychEngine
+      BUILD_DIR: ${{ github.workspace }}/.build/PsychEngine
     steps:
       - name: Checkout uploaded project files
         uses: actions/checkout@v4
