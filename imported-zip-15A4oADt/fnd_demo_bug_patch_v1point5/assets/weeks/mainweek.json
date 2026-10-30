@@ -1,0 +1,21 @@
+{
+	"songs": [
+		["Perseverance", "gf", [95, 31, 255]],
+		["Kinemorto", "gf", [255, 87, 0]]
+	],
+
+	"weekCharacters": [
+		"",
+		"bf",
+		"gf"
+	],
+	"weekBackground": "stage",
+
+	"storyName": "",
+	"weekBefore": "mainweek",
+	"weekName": "Main Week",
+	"startUnlocked": true,
+
+	"hideStoryMode": false,
+	"hideFreeplay": false
+}

@@ -1,0 +1,78 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				-29,
+				52
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFT",
+			"indices": [],
+			"name": "left"
+		},
+		{
+			"offsets": [
+				4,
+				90
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUP",
+			"indices": [],
+			"name": "up"
+		},
+		{
+			"offsets": [
+				-48,
+				45
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "right"
+		},
+		{
+			"offsets": [
+				-61,
+				37
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWN",
+			"indices": [],
+			"name": "down"
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-67,
+				60
+			],
+			"anim": "idle",
+			"fps": 24,
+			"name": "idle",
+			"indices": []
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/perseverance/sans_pixel",
+	"position": [
+		0,
+		0
+	],
+	"healthicon": "sans_core",
+	"flip_x": false,
+	"healthbar_colors": [
+		0,
+		191,
+		255
+	],
+	"camera_position": [
+		20,
+		170
+	],
+	"sing_duration": 5.7,
+	"scale": 0.7
+}

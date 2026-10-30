@@ -1,0 +1,133 @@
+{
+	"animations": [
+		{
+			"loop": false,
+			"offsets": [
+				0,
+				0
+			],
+			"anim": "idle",
+			"fps": 24,
+			"name": "paps_flashback_idle",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-4,
+				-1
+			],
+			"anim": "singLEFT",
+			"fps": 24,
+			"name": "paps_flashback_left",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				2,
+				-14
+			],
+			"anim": "singDOWN",
+			"fps": 24,
+			"name": "paps_flashback_down",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-8,
+				11
+			],
+			"anim": "singRIGHT",
+			"fps": 24,
+			"name": "paps_flashback_right",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-10,
+				87
+			],
+			"anim": "singUP",
+			"fps": 24,
+			"name": "paps_flashback_up",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-1,
+				0
+			],
+			"anim": "idlemad",
+			"fps": 24,
+			"name": "paps_flashbackMAD_idle",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-6,
+				2
+			],
+			"anim": "singLEFTmad",
+			"fps": 24,
+			"name": "paps_flashbackMAD_left",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				1,
+				-14
+			],
+			"anim": "singDOWNmad",
+			"fps": 24,
+			"name": "paps_flashbackMAD_down",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-10,
+				-1
+			],
+			"anim": "singRIGHTmad",
+			"fps": 24,
+			"name": "paps_flashbackMAD_right",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-10,
+				86
+			],
+			"anim": "singUPmad",
+			"fps": 24,
+			"name": "paps_flashbackMAD_up",
+			"indices": []
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/dustswap/paps_flashback",
+	"position": [
+		-40,
+		190
+	],
+	"healthicon": "icon-dustswap-paps-fb",
+	"flip_x": false,
+	"healthbar_colors": [
+		215,
+		80,
+		20
+	],
+	"camera_position": [
+		60,
+		-10
+	],
+	"sing_duration": 6.1,
+	"scale": 1
+}

@@ -1,0 +1,155 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				-5,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "sans_flashback_idle"
+		},
+		{
+			"offsets": [
+				1,
+				-2
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFTmiss",
+			"indices": [],
+			"name": "sans_flashback_leftMISS"
+		},
+		{
+			"offsets": [
+				4,
+				-36
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWNmiss",
+			"indices": [],
+			"name": "sans_flashback_downMISS"
+		},
+		{
+			"offsets": [
+				113,
+				25
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUPmiss",
+			"indices": [],
+			"name": "sans_flashback_upMISS"
+		},
+		{
+			"offsets": [
+				-11,
+				-29
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHTmiss",
+			"indices": [],
+			"name": "sans_flashback_rightMISS"
+		},
+		{
+			"offsets": [
+				208,
+				119
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "deathConfirm",
+			"indices": [],
+			"name": "sans_flashback_deathEND"
+		},
+		{
+			"offsets": [
+				4,
+				-36
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWN",
+			"indices": [],
+			"name": "sans_flashback_down0"
+		},
+		{
+			"offsets": [
+				109,
+				25
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUP",
+			"indices": [],
+			"name": "sans_flashback_up0"
+		},
+		{
+			"offsets": [
+				-13,
+				-29
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "sans_flashback_right0"
+		},
+		{
+			"offsets": [
+				126,
+				99
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "deathLoop",
+			"indices": [],
+			"name": "sans_flashback_deathLOOP"
+		},
+		{
+			"offsets": [
+				1,
+				-2
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFT",
+			"indices": [],
+			"name": "sans_flashback_left0"
+		},
+		{
+			"offsets": [
+				111,
+				96
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "firstDeath",
+			"indices": [],
+			"name": "sans_flashback_death0"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/dustswap/sans_flashback",
+	"position": [
+		70,
+		310
+	],
+	"healthicon": "icon-dustswap-sans-fb",
+	"flip_x": true,
+	"healthbar_colors": [
+		49,
+		176,
+		209
+	],
+	"camera_position": [
+		110,
+		-20
+	],
+	"sing_duration": 4,
+	"scale": 1
+}
